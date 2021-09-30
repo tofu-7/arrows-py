@@ -19,7 +19,7 @@ def endCheck(board): #how was this easy
                 return False
     return True
 
-#def legalCheck(move, board): #This is terrible
+def legalCheck(move, board): #This is terrible
     i = 1
     if move[2] == 1: #NORTH
         while True:
@@ -28,8 +28,6 @@ def endCheck(board): #how was this easy
                     return False
                 elif board[move[1] - i][move[0]] == 0:
                     return True
-                elif board[move[1] - i][move[0]] != 0:
-                    return False
                 else:
                     i += 1
             except IndexError:
@@ -108,7 +106,7 @@ def endCheck(board): #how was this easy
                 return False
     return False
 
-def betterLegalCheck(move, board): #AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+#def betterLegalCheck(move, board): #AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     if move[2] == 1: #NORTH
         for i in range(0, shape(board)[0] - 1 - move[1]):
             if board[move[1]-i][move[0]] == 0:
