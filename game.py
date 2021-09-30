@@ -19,7 +19,7 @@ def endCheck(board): #how was this easy
                 return False
     return True
 
-def legalCheck(move, board): #This is terrible
+#def legalCheck(move, board): #This is terrible
     i = 1
     if move[2] == 1: #NORTH
         while True:
@@ -28,6 +28,8 @@ def legalCheck(move, board): #This is terrible
                     return False
                 elif board[move[1] - i][move[0]] == 0:
                     return True
+                elif board[move[1] - i][move[0]] != 0:
+                    return False
                 else:
                     i += 1
             except IndexError:
@@ -65,6 +67,7 @@ def legalCheck(move, board): #This is terrible
         while True:
             try:
                 if board[move[1] + i][move[0]] == 0:
+                    print ("here")
                     return True
                 else:
                     i += 1
@@ -104,6 +107,12 @@ def legalCheck(move, board): #This is terrible
             except IndexError:
                 return False
     return False
+
+def betterLegalCheck(move, board): #AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    if move[2] == 1: #NORTH
+        for i in range(0, shape(board)[0] - 1 - move[1]):
+            if board[move[1]-i][move[0]] == 0:
+                return True
 
 def pointSpaceUpdate(move, board): #This is worse than legalCheck
     i = 1
@@ -202,9 +211,36 @@ def pointSpaceUpdate(move, board): #This is worse than legalCheck
                 return pointSpace
     return pointSpace
 
-def scoreCounter(board): #TODO Make this
-    #TODO return tuple of p1 score and p2 score
-    print(board%2)
+def floodfill(boardIn, y, x, p1, gSize): #https://stackoverflow.com/questions/19839947/flood-fill-in-python
+    group = gSize
+    #"hidden" stop clause - not reinvoking for "c" or "b", only for "a".
+    if p1 and board[y][x] == 1:  
+        group += 1
+        boardIn = 2
+        #recursively invoke flood fill on all surrounding cells:
+        if y > 0:
+            group = floodfill(boardIn,y-1,x, p1, group)
+        if y < shape(board)[0] - 1:
+            group = floodfill(boardIn,y+1,x, p1, group)
+        if x > 0:
+            group = floodfill(boardIn,y,x-1, p1, group)
+        if x < shape(board)[1] - 1:
+            group = floodfill(boardIn,y,x+1, p1, group)
+    
+    if not p1 and board[y][x] == 0:  
+        group += 1
+        boardIn = 2
+        #recursively invoke flood fill on all surrounding cells:
+        if y > 0:
+            group = floodfill(boardIn,y-1,x, p1, gSize)
+        if y < shape(board)[0] - 1:
+            group = floodfill(boardIn,y+1,x, p1, gSize)
+        if x > 0:
+            group = floodfill(boardIn,y,x-1, p1, gSize)
+        if x < shape(board)[1] - 1:
+            group = floodfill(boardIn,y,x+1, p1, gSize)
+    
+    return group
 
 boardDim = (8, 8) #Board Dimensions X,Y
 board = np.full((boardDim[1],boardDim[0]), 0) #board state encoding
@@ -223,10 +259,9 @@ while not (gameDone): #Game Loop
         break
 
     #Input
-    mInfo = (9,9,9)
     while True:
         mInfo = (int(input("Cell X: ")) - 1, int(input("Cell Y: ")) - 1, int(input("Direction: "))) #TODO -1 is for ease of use in console prototype
-        if pointSpace [mInfo[1]][mInfo[0]] == True:
+        if pointSpace [mInfo[1]][mInfo[0]] == True and board[mInfo[1]][mInfo[0]] == 0:
             break
         else:
             print("Input a Legal Space")
@@ -251,7 +286,8 @@ while not (gameDone): #Game Loop
     p1Turn = not p1Turn
 
 # TODO Count Score
-scoreCounter(board)
+p1Score = floodfill(board % 2, 0, 0, True, 0)
+print (p1Score)
 
 # TODO Determine Winner
 # TODO Cry
