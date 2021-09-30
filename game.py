@@ -1,4 +1,4 @@
-### THOUGHTS
+### NOTE
 # Encode board state as a matrix:
 # x, y, Cell State
 # Cell States = Nothing, P1 North, P2 North, P1 NE, P2 NE, ..., P1 NW, P2 NW.
@@ -202,12 +202,15 @@ def pointSpaceUpdate(move, board): #This is worse than legalCheck
                 return pointSpace
     return pointSpace
 
+def scoreCounter(board): #TODO Make this
+    #TODO return tuple of p1 score and p2 score
+    print(board%2)
+
 boardDim = (8, 8) #Board Dimensions X,Y
 board = np.full((boardDim[1],boardDim[0]), 0) #board state encoding
 pointSpace = np.full((boardDim[1],boardDim[0]), True) #was a space pointed into by previous move
 gameDone = False #end condition met?
 p1Turn = True #whos turn is it
-
 
 while not (gameDone): #Game Loop
     #Show me board state
@@ -248,6 +251,8 @@ while not (gameDone): #Game Loop
     p1Turn = not p1Turn
 
 # TODO Count Score
+scoreCounter(board)
+
 # TODO Determine Winner
 # TODO Cry
 # TODO Graphics
