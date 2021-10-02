@@ -10,6 +10,13 @@
 #  / | \
 # 6  5  4
 #
+# Encoding Directions for Player 1 (add 1 for Player 2 Directions)
+# 15  1  3
+#   \ | /
+# 13--0--5
+#   / | \
+# 11  9  7
+#
 # Standard Rules
 # https://docs.google.com/document/d/1ktpS0tOxAkbPBtf-p-Orr_Svy0R5ypZU-VdUvGMtIas/edit?usp=sharing
 
@@ -116,8 +123,38 @@ def pointSpaceUpdate(y, x, d, board, psMatrix): #i think it works?
     else:
         return psMatrix
 
-def floodfill(boardIn, y, x, check): #TODO return a floodfilled matrix from point y,x
-    print("placeholder")
+def floodfill(board, visit, group, y, x, p1): #flood fill algorith returns size of group centered on point
+    if p1 and board[y][x] == 1:  #p1 case
+        visit[y][x] = True
+        group += 1
+
+        #recursively invoke flood fill on all surrounding cells:
+        if x > 0 and not visit[y][x-1]:
+            floodfill(board, visit, group, y, x-1, p1)
+        if x < shape(board)[1] - 1 and not visit[y][x+1]:
+            floodfill(board, visit, group, y, x+1, p1)
+        if y > 0 and not visit[y-1][x]:
+            floodfill(board, visit, group, y-1, x, p1)
+        if y < shape(board)[0] - 1 and not visit[y+1][x]:
+            floodfill(board, visit, group, y+1, x, p1)
+        
+        return group
+    
+    elif not p1 and board[y][x] == 0: #p2 case
+        visit[y][x] = True
+        group += 1
+
+        if x > 0 and not visit[y][x-1]:
+            floodfill(board, visit, group, y, x-1, p1)
+        if x < shape(board)[1] - 1 and not visit[y][x+1]:
+            floodfill(board, visit, group, y, x+1, p1)
+        if y > 0 and not visit[y-1][x]:
+            floodfill(board, visit, group, y-1, x, p1)
+        if y < shape(board)[0] - 1 and not visit[y+1][x]:
+            floodfill(board, visit, group, y+1, x, p1)
+
+        return group
+        
 
 boardDim = (8, 8) #Board Dimensions X,Y
 board = np.full((boardDim[1],boardDim[0]), 0) #board state encoding
@@ -130,6 +167,7 @@ while not (endCheck(board)): #Game Loop
     print(board) 
 
     #Input
+    print(pointSpace)
     while True:
         mInfo = (int(input("Cell X: ")) - 1, int(input("Cell Y: ")) - 1, int(input("Direction: "))) #TODO -1 is for ease of use in console prototype
         if pointSpace[mInfo[1]][mInfo[0]] == True and board[mInfo[1]][mInfo[0]] == 0:
@@ -165,8 +203,28 @@ while not (endCheck(board)): #Game Loop
 print(board)
 
 # TODO Count Score
-#p1board = floodfill(board % 2, 0, 0, True, 0)
+colorBoard = board % 2
+visitBoard = np.full(shape(board), False)
+p1Groups = []
+p2Groups = []
 
-# TODO Determine Winner
+for i in range(0, shape(board)[0] - 1):
+    for j in range(0, shape(board)[1] - 1):
+        if colorBoard[i][j] == 1 and not visitBoard[i][j]: #p1 case
+            p1Groups.append(floodfill(colorBoard, visitBoard, 0, i, j, True))
+        elif colorBoard[i][j] == 0 and not visitBoard[i][j]: #p2 case
+            p2Groups.append(floodfill(colorBoard, visitBoard, 0, i, j, False))
+
+# Determine Winner
+p1Score = max(p1Groups)
+p2Score = max(p2Groups)
+
+if p1Score > p2Score:
+    print("Player 1 Wins: " + str(p1Score) + " v " + str(p2Score))
+elif p2Score > p1Score:
+    print("Player 2 Wins: " + str(p1Score) + " v " + str(p2Score))
+elif p1Score == p2Score:
+    print("Draw: " + str(p1Score) + " v " + str(p2Score))
+
 # TODO Cry
 # TODO Graphics
