@@ -23,6 +23,7 @@
 import numpy as np
 from numpy.core.fromnumeric import shape
 from numpy.core.numeric import full
+import largestBlob as lcb
 
 def moveDirectionToEncoding(p1, dir): #take input direction and converts it into encoding direction
     val = (2 * dir) - 1 #why does this feel wrong to me lol
@@ -44,35 +45,35 @@ def legalCheck(y, x, d, board): #better now maybe
     if d == 1 and board[y][x] == 0: #NORTH
         return True
     elif d == 1 and (y > 0):
-        legalCheck(y-1, x, d, board)
+        return legalCheck(y-1, x, d, board)
     elif d == 2 and board[y][x] == 0: #NE
         return True
     elif d== 2 and (y > 0 and x < xMax):
-        legalCheck(y-1, x+1, d, board)
+        return legalCheck(y-1, x+1, d, board)
     elif d == 3 and board[y][x] == 0: #East
         return True
     elif d== 3 and (x < xMax):
-        legalCheck(y, x+1, d, board)
+        return legalCheck(y, x+1, d, board)
     elif d == 4 and board[y][x] == 0: #SE
         return True
     elif d== 4 and (y < yMax and x < xMax):
-        legalCheck(y+1, x+1, d, board)
+        return legalCheck(y+1, x+1, d, board)
     elif d == 5 and board[y][x] == 0: #South
         return True
     elif d== 5 and (y < yMax):
-        legalCheck(y+1, x, d, board)
+        return legalCheck(y+1, x, d, board)
     elif d == 6 and board[y][x] == 0: #SW
         return True
     elif d== 6 and (y < yMax and x > 0):
-        legalCheck(y+1, x-1, d, board)
+        return legalCheck(y+1, x-1, d, board)
     elif d == 7 and board[y][x] == 0: #West
         return True
     elif d== 7 and (x > 0):
-        legalCheck(y, x-1, d, board)
+        return legalCheck(y, x-1, d, board)
     elif d == 8 and board[y][x] == 0: #NW
         return True
     elif d== 8 and (y > 0 and x > 0):
-        legalCheck(y-1, x-1, d, board)
+        return legalCheck(y-1, x-1, d, board)
     else:
         return False
         
@@ -82,81 +83,55 @@ def pointSpaceUpdate(y, x, d, board, psMatrix): #i think it works?
 
     if d == 1 and board[y][x] == 0 and psMatrix[y][x] != True: #NORTH
         psMatrix[y][x] = True
-        pointSpaceUpdate(y, x, d, board, psMatrix)
+        return pointSpaceUpdate(y, x, d, board, psMatrix)
     elif d == 1 and (y > 0):
-        pointSpaceUpdate(y-1, x, d, board, psMatrix)
+        return pointSpaceUpdate(y-1, x, d, board, psMatrix)
     elif d == 2 and board[y][x] == 0 and psMatrix[y][x] != True: #NE
         psMatrix[y][x] = True
-        pointSpaceUpdate(y, x, d, board, psMatrix)
+        return pointSpaceUpdate(y, x, d, board, psMatrix)
     elif d== 2 and (y > 0 and x < xMax):
-        pointSpaceUpdate(y-1, x+1, d, board, psMatrix)
+        return pointSpaceUpdate(y-1, x+1, d, board, psMatrix)
     elif d == 3 and board[y][x] == 0 and psMatrix[y][x] != True: #East
         psMatrix[y][x] = True
-        pointSpaceUpdate(y, x, d, board, psMatrix)
+        return pointSpaceUpdate(y, x, d, board, psMatrix)
     elif d== 3 and (x < xMax):
-        pointSpaceUpdate(y, x+1, d, board, psMatrix)
+        return pointSpaceUpdate(y, x+1, d, board, psMatrix)
     elif d == 4 and board[y][x] == 0 and psMatrix[y][x] != True: #SE
         psMatrix[y][x] = True
-        pointSpaceUpdate(y, x, d, board, psMatrix)
+        return pointSpaceUpdate(y, x, d, board, psMatrix)
     elif d== 4 and (y < yMax and x < xMax):
-        pointSpaceUpdate(y+1, x+1, d, board, psMatrix)
+        return pointSpaceUpdate(y+1, x+1, d, board, psMatrix)
     elif d == 5 and board[y][x] == 0 and psMatrix[y][x] != True: #South
         psMatrix[y][x] = True
-        pointSpaceUpdate(y, x, d, board, psMatrix)
+        return pointSpaceUpdate(y, x, d, board, psMatrix)
     elif d== 5 and (y < yMax):
-        pointSpaceUpdate(y+1, x, d, board, psMatrix)
+        return pointSpaceUpdate(y+1, x, d, board, psMatrix)
     elif d == 6 and board[y][x] == 0 and psMatrix[y][x] != True: #SW
         psMatrix[y][x] = True
-        pointSpaceUpdate(y, x, d, board, psMatrix)
+        return pointSpaceUpdate(y, x, d, board, psMatrix)
     elif d== 6 and (y < yMax and x > 0):
-        pointSpaceUpdate(y+1, x-1, d, board, psMatrix)
+        return pointSpaceUpdate(y+1, x-1, d, board, psMatrix)
     elif d == 7 and board[y][x] == 0 and psMatrix[y][x] != True: #West
         psMatrix[y][x] = True
-        pointSpaceUpdate(y, x, d, board, psMatrix)
+        return pointSpaceUpdate(y, x, d, board, psMatrix)
     elif d== 7 and (x > 0):
-        pointSpaceUpdate(y, x-1, d, board, psMatrix)
+        return pointSpaceUpdate(y, x-1, d, board, psMatrix)
     elif d == 8 and board[y][x] == 0 and psMatrix[y][x] != True: #NW
         psMatrix[y][x] = True
-        pointSpaceUpdate(y, x, d, board, psMatrix)
+        return pointSpaceUpdate(y, x, d, board, psMatrix)
     elif d== 8 and (y > 0 and x > 0):
-        pointSpaceUpdate(y-1, x-1, d, board, psMatrix)
+        return pointSpaceUpdate(y-1, x-1, d, board, psMatrix)
     else:
         return psMatrix
-
-def floodfill(board, visit, group, y, x, p1): #flood fill algorith returns size of group centered on point
-    if p1 and board[y][x] == 1:  #p1 case
-        visit[y][x] = True
-        group += 1
-
-        #recursively invoke flood fill on all surrounding cells:
-        if x > 0 and not visit[y][x-1]:
-            floodfill(board, visit, group, y, x-1, p1)
-        if x < shape(board)[1] - 1 and not visit[y][x+1]:
-            floodfill(board, visit, group, y, x+1, p1)
-        if y > 0 and not visit[y-1][x]:
-            floodfill(board, visit, group, y-1, x, p1)
-        if y < shape(board)[0] - 1 and not visit[y+1][x]:
-            floodfill(board, visit, group, y+1, x, p1)
-        
-        return group
     
-    elif not p1 and board[y][x] == 0: #p2 case
-        visit[y][x] = True
-        group += 1
+def scoreCount(board, col):
+    board = board % 2
+    board = lcb.LargestColorBlob(board)
+    return board.biggest_blob(col)
 
-        if x > 0 and not visit[y][x-1]:
-            floodfill(board, visit, group, y, x-1, p1)
-        if x < shape(board)[1] - 1 and not visit[y][x+1]:
-            floodfill(board, visit, group, y, x+1, p1)
-        if y > 0 and not visit[y-1][x]:
-            floodfill(board, visit, group, y-1, x, p1)
-        if y < shape(board)[0] - 1 and not visit[y+1][x]:
-            floodfill(board, visit, group, y+1, x, p1)
-
-        return group
         
 
-boardDim = (8, 8) #Board Dimensions X,Y
+boardDim = (4, 4) #Board Dimensions X,Y
 board = np.full((boardDim[1],boardDim[0]), 0) #board state encoding
 pointSpace = np.full((boardDim[1],boardDim[0]), True) #was a space pointed into by previous move
 gameDone = False #end condition met?
@@ -169,7 +144,7 @@ while not (endCheck(board)): #Game Loop
     #Input
     print(pointSpace)
     while True:
-        mInfo = (int(input("Cell X: ")) - 1, int(input("Cell Y: ")) - 1, int(input("Direction: "))) #TODO -1 is for ease of use in console prototype
+        mInfo = (int(input("Cell X: ")) - 1, int(input("Cell Y: ")) - 1, int(input("Direction: "))) #NOTE -1 is for ease of use in console prototype
         if pointSpace[mInfo[1]][mInfo[0]] == True and board[mInfo[1]][mInfo[0]] == 0:
             break
         else:
@@ -179,7 +154,8 @@ while not (endCheck(board)): #Game Loop
     board[mInfo[1]][mInfo[0]] = moveDirectionToEncoding(p1Turn, mInfo[2])
 
     #Legal Check
-    legal = legalCheck(mInfo[1], mInfo[0], mInfo[2], board)
+    '''legal = legalCheck(mInfo[1], mInfo[0], mInfo[2], board)
+    print(legal)
 
     if legal == False: #if not legal
         for i in range(0, shape(board)[0]): #loop over board filling empty spaces with oppsing player arrows (per rule 3.2)
@@ -190,34 +166,30 @@ while not (endCheck(board)): #Game Loop
                     board[i][j] = 1
 
         if endCheck(board):
-            break
+            break'''
 
 
     #Update Point Space Matrix
     pointSpace = np.full(shape(board), False)
     pointSpace = pointSpaceUpdate(mInfo[1], mInfo[0], mInfo[2], board, pointSpace)
+    if not np.any(pointSpace) == True:
+        print('here')
+        for i in range(shape(board)[0]):
+            for j in range(shape(board)[1]):
+                if board[i][j] == 0:
+                    board[i][j] = int(p1Turn) + 1
+        print(int(p1Turn)+1)
+        print(board)
 
     #Update Turn Bool
     p1Turn = not p1Turn
 
 print(board)
 
-# TODO Count Score
-colorBoard = board % 2
-visitBoard = np.full(shape(board), False)
-p1Groups = []
-p2Groups = []
-
-for i in range(0, shape(board)[0] - 1):
-    for j in range(0, shape(board)[1] - 1):
-        if colorBoard[i][j] == 1 and not visitBoard[i][j]: #p1 case
-            p1Groups.append(floodfill(colorBoard, visitBoard, 0, i, j, True))
-        elif colorBoard[i][j] == 0 and not visitBoard[i][j]: #p2 case
-            p2Groups.append(floodfill(colorBoard, visitBoard, 0, i, j, False))
 
 # Determine Winner
-p1Score = max(p1Groups)
-p2Score = max(p2Groups)
+p1Score = scoreCount(board, 1)
+p2Score = scoreCount(board, 0)
 
 if p1Score > p2Score:
     print("Player 1 Wins: " + str(p1Score) + " v " + str(p2Score))
